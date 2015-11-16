@@ -31,12 +31,8 @@ auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth, parser=tweepy.parsers.JSONParser())
 
 
-def getTs(channel1,channel2,channel3,n):
-    print channel1
-    print channel2
-    print channel3
-    print n
-    print(api.user_timeline("potus",count=10)) #Test Twitter channels
+def process_tweets(channel1,channel2,channel3,n):
+    tweets_src_one=api.user_timeline("potus",count=10) #Test Twitter channels
     tweets_src_two=api.user_timeline(channel2,count=n)
     tweets_src_three=api.user_timeline(channel3,count=n)
     raw_tweets=[]

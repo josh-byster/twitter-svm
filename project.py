@@ -7,5 +7,5 @@ numpy.set_printoptions(threshold=numpy.nan)
 
 args=process_tweets("potus","who","imdb",10)
 vectorizer = CountVectorizer()
-fit_array = vectorizer.fit_transform(args).toarray()
+fit_array = numpy.array(vectorizer.fit_transform(args).toarray())
 print(fit_array)

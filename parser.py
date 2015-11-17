@@ -32,18 +32,20 @@ api = tweepy.API(auth, parser=tweepy.parsers.JSONParser())
 
 
 def process_tweets(channel1,channel2,channel3,n):
-    tweets_src_one=api.user_timeline("potus",count=10) #Test Twitter channels
+    tweets_src_one=api.user_timeline(channel1,count=n) #Test Twitter channels
     tweets_src_two=api.user_timeline(channel2,count=n)
     tweets_src_three=api.user_timeline(channel3,count=n)
     raw_tweets=[]
     stripped_tweets=[]
-    def appendToRaw(arr):
+    names=[]
+    def appendToRaw(arr,name):
         for i in range(0,len(arr)):
             raw_tweets.append(arr[i])
-    appendToRaw(tweets_src_one)
-    appendToRaw(tweets_src_two)
-    appendToRaw(tweets_src_three)
-    print "TEST"
+            names.append(name)
+    appendToRaw(tweets_src_one,channel1)
+    appendToRaw(tweets_src_two,channel2)
+    appendToRaw(tweets_src_three,channel3)
+    print names
     for obj in raw_tweets:
         #print(obj["text"])
         text=re.sub(r"(?:\@|https?\://)\S+", '', obj["text"], flags=re.MULTILINE)

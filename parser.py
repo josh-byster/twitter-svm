@@ -45,10 +45,8 @@ def process_tweets(channel1,channel2,channel3,n):
     appendToRaw(tweets_src_one,channel1)
     appendToRaw(tweets_src_two,channel2)
     appendToRaw(tweets_src_three,channel3)
-    print names
     for obj in raw_tweets:
         #print(obj["text"])
         text=re.sub(r"(?:\@|https?\://)\S+", '', obj["text"], flags=re.MULTILINE)
         stripped_tweets.append(text)
-    return stripped_tweets
-
+    return (stripped_tweets,names)

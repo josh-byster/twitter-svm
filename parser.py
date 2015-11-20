@@ -27,26 +27,21 @@ access_token_secret=keys["oauth_token_secret"]
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.secure = True
 auth.set_access_token(access_token, access_token_secret)
-
 api = tweepy.API(auth, parser=tweepy.parsers.JSONParser())
 
-
-def process_tweets(channel1,channel2,channel3,n):
-    tweets_src_one=api.user_timeline(channel1,count=n) #Test Twitter channels
-    tweets_src_two=api.user_timeline(channel2,count=n)
-    tweets_src_three=api.user_timeline(channel3,count=n)
-    raw_tweets=[]
-    stripped_tweets=[]
-    names=[]
-    def appendToRaw(arr,name):
-        for i in range(0,len(arr)):
-            raw_tweets.append(arr[i])
-            names.append(name)
-    appendToRaw(tweets_src_one,channel1)
-    appendToRaw(tweets_src_two,channel2)
-    appendToRaw(tweets_src_three,channel3)
-    for obj in raw_tweets:
-        #print(obj["text"])
-        text=re.sub(r"(?:\@|https?\://)\S+", '', obj["text"], flags=re.MULTILINE)
-        stripped_tweets.append(text)
-    return (stripped_tweets,names)
+def getTweets(channels,n):
+    x_values=[]
+    y_values=[]
+    for channel in channels:
+        page = 1
+        while page<=n:
+            statuses = api.user_timeline(page=page, id=channel)
+            print statuses
+            if statuses:
+                for status in statuses:
+                    # process status here
+                    x_values.append(status["text"])
+                    y_values.append(channel)
+                    n+=1
+            page += 1
+    return (x_values,y_values)

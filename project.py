@@ -1,5 +1,5 @@
 from __future__ import absolute_import, print_function
-from parser import process_tweets
+from parser import getTweets
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.svm import SVC
 from sklearn import cross_validation
@@ -7,7 +7,9 @@ import sklearn
 import numpy
 numpy.set_printoptions(threshold=numpy.nan)
 
-args=process_tweets("nbcnews","who","imdb",1000) #Returns tuple value in form (data,names)
+args=getTweets(["nbcnews","who","imdb"],10) #Returns tuple value in form (data,names) - number is in tuple form
+print(args[0])
+print(args[1])
 vectorizer = CountVectorizer()
 fit_array = numpy.array(vectorizer.fit_transform(args[0]).toarray())
 X_train, X_test, y_train, y_test = cross_validation.train_test_split(fit_array, args[1], test_size=0.33, random_state=42)

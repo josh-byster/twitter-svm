@@ -29,19 +29,18 @@ auth.secure = True
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth, parser=tweepy.parsers.JSONParser())
 
-def getTweets(channels,n):
+def parse(channels,n):
     x_values=[]
     y_values=[]
     for channel in channels:
         page = 1
         while page<=n:
             statuses = api.user_timeline(page=page, id=channel)
-            print statuses
             if statuses:
                 for status in statuses:
                     # process status here
                     x_values.append(status["text"])
                     y_values.append(channel)
-                    n+=1
+                    print(status["text"])
             page += 1
-    return (x_values,y_values)
+    return (x_values,y_values,api.rate_limit_status()['resources']['statuses']['/statuses/user_timeline']['remaining'])

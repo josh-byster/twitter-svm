@@ -26,4 +26,6 @@ print("Accuracy percentage: " + str(sklearn.metrics.accuracy_score(y_test[:1000]
 print("API requests remaining: " + str(args[2]))
 print(pred_values)
 print(y_test)
-print(pd.crosstab(y_test, pred_values, rownames=['True'], colnames=['Predicted'], margins=True))
+print(sklearn.metrics.confusion_matrix(y_test, pred_values, labels=None))
+
+

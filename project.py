@@ -8,7 +8,7 @@ import numpy
 from sklearn.externals import joblib
 numpy.set_printoptions(threshold=numpy.nan)
 
-args=retrieve.parse(["nbcnews","who","imdb"],2) #Returns tuple value in form (data,names) - number is in tuple form
+tweets=retrieve.parse(["nbcnews","who","imdb"],1) 
 vectorizer = CountVectorizer()
 fit_array = numpy.array(vectorizer.fit_transform(args[0]).toarray())
 X_train, X_test, y_train, y_test = cross_validation.train_test_split(fit_array, args[1], test_size=0.33)

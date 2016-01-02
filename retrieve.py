@@ -8,6 +8,7 @@ import re
 from credentials import keys
 import tweepy
 import numpy
+from TweetObj import obj
 # == OAuth Authentication ==
 #
 # This mode of authentication is the new preferred way
@@ -28,19 +29,15 @@ auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.secure = True
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth, parser=tweepy.parsers.JSONParser())
-
+objList=[]
 def parse(channels,n):
-    x_values=[]
-    y_values=[]
     for channel in channels:
         page = 1
         while page<=n:
             statuses = api.user_timeline(page=page, id=channel)
             if statuses:
                 for status in statuses:
-                    # process status here
-                    x_values.append(status["text"])
-                    y_values.append(channel)
-                    print(status["text"])
+                    newTweet = Tweet(status["text"],channel)
+                    objList.append(newTweet)
             page += 1
-    return (x_values,y_values,api.rate_limit_status()['resources']['statuses']['/statuses/user_timeline']['remaining'])
+    return objList

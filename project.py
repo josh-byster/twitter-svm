@@ -1,5 +1,5 @@
 from __future__ import absolute_import, print_function
-from retrieve import *
+from calculations import *
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.svm import LinearSVC,SVC
 from sklearn.svm import SVC
@@ -15,13 +15,13 @@ channels=["nbcnews","who","imdb"]
 pages=1
 split_ratio=0.33
 C=100
-shouldReturnAccuracy=True
+shouldReturnMetrics=True
     
 tweets=parse(channels,pages) 
 X_train, X_test, y_train, y_test = split(tweets,split_ratio)
 model=fit(X_train,y_train,C)
 predicted_vals=predict(X_test,model)
-getWrongValues(predicted_vals,y_test,shouldReturnAccuracy)
+getWrongValues(predicted_vals,y_test,shouldReturnMetrics)
 
 
 

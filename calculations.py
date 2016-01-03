@@ -5,9 +5,13 @@ Created on Mon Nov 16 15:01:36 2015
 @author: josbys1
 """
 import re
+import time
+import math
 from credentials import keys
 import tweepy
 import numpy
+import sys
+from sklearn.externals import joblib
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.svm import LinearSVC,SVC
 from sklearn.svm import SVC
@@ -34,6 +38,10 @@ auth.secure = True
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth, parser=tweepy.parsers.JSONParser())
 
+def readFromMemory(location):
+    return joblib.load(location +'.pkl')
+def store(tweets,location):
+    joblib.dump(tweets,location+'.pkl')
 
 def parse(channels,n):
     objList=[]

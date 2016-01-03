@@ -9,15 +9,22 @@ from sklearn.externals import joblib
 numpy.set_printoptions(threshold=numpy.nan)
 
 #MODIFY VARIABLES HERE
-retrieveMemory=False
-overwriteMemory=False
+retrieveType="load" #should be load or save in quotes - should test set be loaded from memory or fetched new?
+loadName='tweets' #only matters if type is "load"
+saveName='tweets' #only matters if type is "save"
 channels=["nbcnews","who","imdb"]
-pages=1
+pages=45
 split_ratio=0.33
 C=100
 shouldReturnMetrics=True
-    
-tweets=parse(channels,pages) 
+
+if(retrieveType=="load"):
+    tweets=readFromMemory(loadName)
+if(retrieveType=="save"):
+    tweets=parse(channels,pages)
+    if(saveTestSet):
+        store(tweets,saveName)
+
 X_train, X_test, y_train, y_test = split(tweets,split_ratio)
 model=fit(X_train,y_train,C)
 predicted_vals=predict(X_test,model)

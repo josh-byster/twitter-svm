@@ -82,10 +82,10 @@ def vectorize(tweets):
     return numpy.array(vectorizer.fit_transform(getX(tweets)).toarray())
 
 def split(tweets,size):
-   return cross_validation.train_test_split(vectorize(tweets), getY(tweets), test_size=0.33)
+   return cross_validation.train_test_split(vectorize(tweets), getY(tweets), test_size=size)
 
-def fit(X_train,y_train,C):
-    clf = LinearSVC(C=100)
+def fit(X_train,y_train,Cval):
+    clf = LinearSVC(C=Cval)
     clf.fit(X_train,y_train)
     return clf
 

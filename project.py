@@ -20,9 +20,9 @@ shouldReturnMetrics=True
 
 if(retrieveType=="load"):
     tweets=readFromMemory(loadName)
-if(retrieveType=="save"):
+else:
     tweets=parse(channels,pages)
-    if(saveTestSet):
+    if(retrieveType=="save"):
         store(tweets,saveName)
 
 X_train, X_test, y_train, y_test = split(tweets,split_ratio)

@@ -53,8 +53,8 @@ def parse(channels,n):
             try:
                 statuses = api.user_timeline(page=page, id=channel)
             except:
-                renew_time = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(api.rate_limit_status()['resources']['statuses']['/statuses/user_timeline']['reset']-86400))
-                sys.exit("Oops! Rate limit exceeded. Try again at: " + str(renew_time))
+                renew_time = time.strftime("%H:%M:%S", time.gmtime(api.rate_limit_status()['resources']['statuses']['/statuses/user_timeline']['reset']-21600))
+                sys.exit("Oops! Rate limit exceeded. Try again at: " + str(renew_time + " CST."))
             if statuses:
                 for status in statuses:
                     newTweet = Tweet(status["text"],channel)
@@ -83,7 +83,7 @@ def vectorize(tweets):
 
 def split(tweets,size):
    return cross_validation.train_test_split(vectorize(tweets), getY(tweets), test_size=0.33)
-  
+
 def fit(X_train,y_train,C):
     clf = LinearSVC(C=100)
     clf.fit(X_train,y_train)
@@ -91,7 +91,7 @@ def fit(X_train,y_train,C):
 
 def predict(x_test,model):
     return model.predict(x_test)
-    
+
 def getWrongValues(pred_values,y_test,percentage):
     count_wrong=0
     for i in range(0, len(pred_values)):

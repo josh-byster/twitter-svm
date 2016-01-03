@@ -44,16 +44,25 @@ def store(tweets,location):
     joblib.dump(tweets,location+'.pkl')
 
 def parse(channels,n):
+    print("Getting tweets...")
     objList=[]
     for channel in channels:
         page = 1
         while page<=n:
-            statuses = api.user_timeline(page=page, id=channel)
+            statuses = None
+            try:
+                statuses = api.user_timeline(page=page, id=channel)
+            except:
+                renew_time = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(api.rate_limit_status()['resources']['statuses']['/statuses/user_timeline']['reset']-86400))
+                sys.exit("Oops! Rate limit exceeded. Try again at: " + str(renew_time))
             if statuses:
                 for status in statuses:
                     newTweet = Tweet(status["text"],channel)
                     objList.append(newTweet)
             page += 1
+            if(page%10==0):
+                print(str(math.ceil(page/float(n) * 100)) + "% done with channel. " + "API calls left: " + str(api.rate_limit_status()['resources']['statuses']['/statuses/user_timeline']['remaining']))
+        print("Moving on to next channel...")
     return objList
 
 def getX(tweets):

@@ -57,7 +57,10 @@ def parse(channels,n):
                 sys.exit("Oops! Rate limit exceeded. Try again at: " + str(renew_time + " CST."))
             if statuses:
                 for status in statuses:
-                    newTweet = Tweet(status["text"],channel)
+                    txt = status["text"]
+                    text_clean = re.sub(r"(?:\@|https?\:\/\/)\S+", "URL", txt)
+                    print(text_clean)
+                    newTweet = Tweet(text_clean,channel)
                     objList.append(newTweet)
             page += 1
             if(page%10==0):

@@ -6,6 +6,7 @@ Created on Mon Nov 16 15:01:36 2015
 """
 import re
 import time
+from scipy import stats
 import math
 from credentials import keys
 import tweepy
@@ -78,19 +79,33 @@ def getY(tweets):
     a=[]
     for obj in tweets:
         a.append(obj.author)
-    return a
+    return numpy.asarray(a)
 
 def vectorize(tweets):
     vectorizer = CountVectorizer()
-    return numpy.array(vectorizer.fit_transform(getX(tweets)).toarray())
+    ft = numpy.array(vectorizer.fit_transform(getX(tweets)).toarray())
+    for i in range(0,len(tweets)-1):
+        tweets[i].vector = ft[i]
+        print(tweets[i].vector)
+    return ft
 
-def split(tweets,size):
-   return cross_validation.train_test_split(vectorize(tweets), getY(tweets), test_size=size)
 
-def fit(X_train,y_train,Cval):
-    clf = LinearSVC(C=Cval)
-    clf.fit(X_train,y_train)
-    return clf
+def split(tweets):
+   return vectorize(tweets),getY(tweets)
+
+def x_validate(X,Y,folds,C):
+    clf = LinearSVC(C=C)
+    cv=cross_validation.ShuffleSplit(len(X), n_iter=folds, test_size=1/float(folds))
+    for train_index, test_index in cv:
+        print("TRAIN:", train_index, "TEST:", test_index)
+    print(len(X))
+    scores=cross_validation.cross_val_score(clf,X,Y,cv=cv)
+    print(scores)
+    print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * stats.t.ppf(1-0.025, len(X)-1)))
+#def fit(X_train,y_train,Cval):
+#    clf = LinearSVC(C=Cval)
+#    clf.fit(X_train,y_train)
+#    return clf
 
 def predict(x_test,model):
     return model.predict(x_test)
@@ -104,5 +119,5 @@ def getWrongValues(pred_values,y_test,percentage):
             count_wrong=count_wrong+1
             print(count_wrong)
     if(percentage):
-        print("Accuracy percentage: " + str(metrics.accuracy_score(y_test[:1000], pred_values, normalize=True, sample_weight=None)))
+        print("Accuracy percentage: " + str(metrics.accuracy_score(y_test, pred_values, normalize=True, sample_weight=None)))
         print(metrics.confusion_matrix(y_test, pred_values, labels=None))

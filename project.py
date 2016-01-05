@@ -11,13 +11,12 @@ numpy.set_printoptions(threshold=numpy.nan)
 #MODIFY VARIABLES HERE
 retrieveType="none" #should be load or save in quotes - should test set be loaded from memory or fetched new?
 loadName='tweets' #only matters if type is "load"
-saveName='tweets' #only matters if type is "save"
-channels=["nbcnews","who","imdb"]
+saveName='tweets20' #only matters if type is "save"
+channels=["nbcnews","who","barackobama"]
 pages=1
 split_ratio=0.33
 C=100
 shouldReturnMetrics=True
-
 if(retrieveType=="load"):
     tweets=readFromMemory(loadName)
 else:

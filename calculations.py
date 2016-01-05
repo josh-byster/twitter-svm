@@ -6,6 +6,7 @@ Created on Mon Nov 16 15:01:36 2015
 """
 import re
 import time
+import pprint
 from scipy import stats
 import math
 from credentials import keys
@@ -16,7 +17,7 @@ from sklearn.externals import joblib
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.svm import LinearSVC,SVC
 from sklearn.svm import SVC
-from sklearn import cross_validation,metrics
+from sklearn import cross_validation,metrics,grid_search
 from TweetObj import Tweet
 # == OAuth Authentication ==
 #
@@ -60,7 +61,6 @@ def parse(channels,n):
                 for status in statuses:
                     txt = status["text"]
                     text_clean = re.sub(r"(?:\@|https?\:\/\/)\S+", "URL", txt)
-                    print(text_clean)
                     newTweet = Tweet(text_clean,channel)
                     objList.append(newTweet)
             page += 1
@@ -86,7 +86,6 @@ def vectorize(tweets):
     ft = numpy.array(vectorizer.fit_transform(getX(tweets)).toarray())
     for i in range(0,len(tweets)-1):
         tweets[i].vector = ft[i]
-        print(tweets[i].vector)
     return ft
 
 
@@ -94,19 +93,29 @@ def split(tweets):
    return vectorize(tweets),getY(tweets)
 
 def x_validate(X,Y,folds,C):
-    clf = LinearSVC(C=C)
-    cv=cross_validation.ShuffleSplit(len(X), n_iter=folds, test_size=1/float(folds))
-    for train_index, test_index in cv:
-        print("TRAIN:", train_index, "TEST:", test_index)
-    print(len(X))
-    scores=cross_validation.cross_val_score(clf,X,Y,cv=cv)
-    print(scores)
-    print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * stats.t.ppf(1-0.025, len(X)-1)))
-#def fit(X_train,y_train,Cval):
-#    clf = LinearSVC(C=Cval)
-#    clf.fit(X_train,y_train)
-#    return clf
+    parameters = {'kernel':['linear'],'C': [0.01,0.1,1,10, 100, 1000]}
+    cv = cross_validation.ShuffleSplit(len(X), n_iter=10, test_size=0.1)
+    #cv=cross_validation.KFold(len(X), n_folds=10,shuffle=True,random_state=None)
+    gs(X,Y,cv,parameters)
+    model1 = SVC(kernel='linear',C=10)
+    model2 = SVC(kernel='linear',C=100)
+    for train,test in cv:
+        model1.fit(X[train],Y[train])
+        model2.fit(X[train],Y[train])
+        p1=predict(X[test],model1)
+        p2=predict(X[test],model2)
+        for i in range(0,len(p1)-1):
+            if(p1[i]!=p2[i]):
+                print("DIFFERING")
+                print(p1[i])
+                print(p2[i])
 
+def gs(X,Y,cv,parameters):
+    svr = SVC()
+    clf = grid_search.GridSearchCV(svr, parameters,cv=cv)
+    clf.fit(X,Y)
+    pprint.pprint(clf.grid_scores_)
+    pprint.pprint(clf.best_params_)
 def predict(x_test,model):
     return model.predict(x_test)
 

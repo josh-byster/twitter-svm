@@ -92,25 +92,8 @@ def vectorize(tweets):
 def split(tweets):
    return vectorize(tweets),getY(tweets)
 
-def x_validate(X,Y,folds,C):
-    parameters = {'kernel':['linear'],'C': [0.01,0.1,1,10, 100, 1000]}
-    cv = cross_validation.ShuffleSplit(len(X), n_iter=10, test_size=0.1)
-    #cv=cross_validation.KFold(len(X), n_folds=10,shuffle=True,random_state=None)
-    gs(X,Y,cv,parameters)
-    model1 = SVC(kernel='linear',C=10)
-    model2 = SVC(kernel='linear',C=100)
-    for train,test in cv:
-        model1.fit(X[train],Y[train])
-        model2.fit(X[train],Y[train])
-        p1=predict(X[test],model1)
-        p2=predict(X[test],model2)
-        for i in range(0,len(p1)-1):
-            if(p1[i]!=p2[i]):
-                print("DIFFERING")
-                print(p1[i])
-                print(p2[i])
-
-def gs(X,Y,cv,parameters):
+def gs(X,Y,folds,parameters):
+    cv=cross_validation.KFold(len(X), n_folds=folds,shuffle=True,random_state=None)
     svr = SVC()
     clf = grid_search.GridSearchCV(svr, parameters,cv=cv)
     clf.fit(X,Y)

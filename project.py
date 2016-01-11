@@ -10,9 +10,11 @@ numpy.set_printoptions(threshold=numpy.nan)
 
 #MODIFY VARIABLES HERE
 retrieveType="none" #should be load or save in quotes - should test set be loaded from memory or fetched new?
+folds=10
+parameters = {'kernel':['linear'],'C': [0.01,0.1,1,10, 100, 1000]}
 loadName='tweets' #only matters if type is "load"
 saveName='tweets20' #only matters if type is "save"
-channels=["nbcnews","who","barackobama"]
+channels=["nbcnews","who","barackobama","taylorswift13"]
 pages=1
 split_ratio=0.33
 C=100
@@ -25,6 +27,6 @@ else:
         store(tweets,saveName)
 
 X,Y = split(tweets)
-x_validate(X,Y,10,C)
+gs(X,Y,folds,parameters)
 
 

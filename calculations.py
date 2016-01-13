@@ -48,12 +48,13 @@ def store(tweets,location):
 def parse(channels,n):
     print("Getting tweets...")
     objList=[]
-    for channel in channels:
+    for x in range(len(channels)):
+        channel=channels[x]
         page = 1
         while page<=n:
             statuses = None
             try:
-                statuses = api.user_timeline(page=page, id=channel)
+                statuses = api.user_timeline(page=page, id=channel,count=200)
             except:
                 renew_time = time.strftime("%H:%M:%S", time.gmtime(api.rate_limit_status()['resources']['statuses']['/statuses/user_timeline']['reset']-21600))
                 sys.exit("Oops! Rate limit exceeded. Try again at: " + str(renew_time + " CST."))
@@ -64,9 +65,8 @@ def parse(channels,n):
                     newTweet = Tweet(text_clean,channel)
                     objList.append(newTweet)
             page += 1
-            if(page%10==0):
-                print(str(math.ceil(page/float(n) * 100)) + "% done with channel. " + "API calls left: " + str(api.rate_limit_status()['resources']['statuses']['/statuses/user_timeline']['remaining']))
-        print("Moving on to next channel...")
+            if(page%5==0):
+                print(str(math.ceil((x*page)/float(n*len(channels)) * 100)) + "% done with channel. " + "API calls left: " + str(api.rate_limit_status()['resources']['statuses']['/statuses/user_timeline']['remaining']))
     return objList
 
 def getX(tweets):
@@ -84,6 +84,7 @@ def getY(tweets):
 def vectorize(tweets):
     vectorizer = CountVectorizer()
     ft = numpy.array(vectorizer.fit_transform(getX(tweets)).toarray())
+    print("Vectorized!")
     for i in range(0,len(tweets)-1):
         tweets[i].vector = ft[i]
     return ft
@@ -96,13 +97,26 @@ def gs(X,Y,folds,parameters):
     cv=cross_validation.KFold(len(X), n_folds=folds,shuffle=True,random_state=None)
     svr = SVC()
     clf = grid_search.GridSearchCV(svr, parameters,cv=cv)
+    print("About to fit...")
     clf.fit(X,Y)
     pprint.pprint(clf.grid_scores_)
     pprint.pprint(clf.best_params_)
+
+def regularSVM(X,Y,c,pctTest,getFeatureWeights,shouldReturnMetrics):
+    svm = LinearSVC(C=c);
+    cv=X_train, X_test, Y_train, Y_test = cross_validation.train_test_split(X,Y, test_size=pctTest, random_state=None)
+    print("Bout to fit")
+    svm.fit(X_train,Y_train)
+    print("Fit!")
+    y_pred=svm.predict(X_test)
+    print("Predicting!")
+    getWrongValues(y_pred,Y_test,shouldReturnMetrics)
+    print(len(X_test))
+
 def predict(x_test,model):
     return model.predict(x_test)
 
-def getWrongValues(pred_values,y_test,percentage):
+def getWrongValues(pred_values,y_test,shouldReturnMetrics):
     count_wrong=0
     for i in range(0, len(pred_values)):
         if(pred_values[i]!=y_test[i]):
@@ -110,6 +124,6 @@ def getWrongValues(pred_values,y_test,percentage):
             print("Actual: " + y_test[i])
             count_wrong=count_wrong+1
             print(count_wrong)
-    if(percentage):
+    if(shouldReturnMetrics):
         print("Accuracy percentage: " + str(metrics.accuracy_score(y_test, pred_values, normalize=True, sample_weight=None)))
         print(metrics.confusion_matrix(y_test, pred_values, labels=None))

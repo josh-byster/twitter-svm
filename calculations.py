@@ -83,11 +83,13 @@ def getY(tweets):
 
 def vectorize(tweets):
     vectorizer = CountVectorizer()
-    ft = numpy.array(vectorizer.fit_transform(getX(tweets)).toarray())
+    fit_vectorizer = vectorizer.fit(getX(tweets))
+    ft = numpy.array(fit_vectorizer.transform(getX(tweets)).toarray())
     print("Vectorized!")
+    print(numpy.array(fit_vectorizer.transform(["Hello my name doge!"])))
     for i in range(0,len(tweets)-1):
         tweets[i].vector = ft[i]
-    return ft
+    return (fit_vectorizer,ft)
 
 
 def split(tweets):
@@ -102,7 +104,7 @@ def gs(X,Y,folds,parameters):
     pprint.pprint(clf.grid_scores_)
     pprint.pprint(clf.best_params_)
 
-def regularSVM(X,Y,c,pctTest,getFeatureWeights,shouldReturnMetrics):
+def regularSVM(X,Y,c,pctTest,getFeatureWeights,channels,shouldReturnMetrics):
     svm = LinearSVC(C=c);
     cv=X_train, X_test, Y_train, Y_test = cross_validation.train_test_split(X,Y, test_size=pctTest, random_state=None)
     print("Bout to fit")
@@ -110,20 +112,21 @@ def regularSVM(X,Y,c,pctTest,getFeatureWeights,shouldReturnMetrics):
     print("Fit!")
     y_pred=svm.predict(X_test)
     print("Predicting!")
-    getWrongValues(y_pred,Y_test,shouldReturnMetrics)
+    getWrongValues(y_pred,Y_test,channels,shouldReturnMetrics)
+    return svm    
     print(len(X_test))
 
 def predict(x_test,model):
     return model.predict(x_test)
 
-def getWrongValues(pred_values,y_test,shouldReturnMetrics):
+def getWrongValues(pred_values,y_test,channels,shouldReturnMetrics=True):
     count_wrong=0
-    for i in range(0, len(pred_values)):
-        if(pred_values[i]!=y_test[i]):
-            print("Predicted: " + pred_values[i])
-            print("Actual: " + y_test[i])
-            count_wrong=count_wrong+1
-            print(count_wrong)
     if(shouldReturnMetrics):
         print("Accuracy percentage: " + str(metrics.accuracy_score(y_test, pred_values, normalize=True, sample_weight=None)))
-        print(metrics.confusion_matrix(y_test, pred_values, labels=None))
+        print(metrics.confusion_matrix(y_test, pred_values, labels=channels))
+        print(channels)
+
+def predictGame(svm,vectorizer):
+    test = ["To date, 10 such #Ebola flare-ups hv been identified in W Africa & are likely due to the virus persisting in survivors even after recovery"]
+    print(vectorizer.transform(test))
+    print(svm.predict(vectorizer.transform(test)))

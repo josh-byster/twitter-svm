@@ -1,16 +1,13 @@
-from __future__ import absolute_import, print_function
 from calculations import *
-import numpy
-numpy.set_printoptions(threshold=numpy.nan)
 
 #MODIFY VARIABLES HERE
 retrieveType="load" #should be load or save in quotes - should test set be loaded from memory or fetched new?
 folds=10
 parameters = {'kernel':['linear'],'C': [0.01,0.1,1,10, 100, 1000]}
 loadName='tweets1k' #only matters if type is "load"
-saveName='tweets1k' #only matters if type is "save"
+saveName='tweets2k' #only matters if type is "save"
 channels=["nbcnews","who","barackobama","taylorswift13","abcnews"]
-pages=6
+pages=10
 pctTest=0.33
 C=100
 getFeatureWeights=True
@@ -22,6 +19,10 @@ else:
     if(retrieveType=="save"):
         store(tweets,saveName)
 
-X,Y = split(tweets)
+vect_return,Y = split(tweets)
+X=vect_return[1]
+vectorizer=vect_return[0]
+print(vectorizer)
 #gs(X,Y,folds,parameters)
-regularSVM(X,Y,C,pctTest,getFeatureWeights,shouldReturnMetrics)
+svm=regularSVM(X,Y,C,pctTest,getFeatureWeights,channels,shouldReturnMetrics)
+predictGame(svm,vectorizer)

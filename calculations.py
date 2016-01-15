@@ -113,7 +113,7 @@ def regularSVM(X,Y,c,pctTest,getFeatureWeights,channels,shouldReturnMetrics):
     y_pred=svm.predict(X_test)
     print("Predicting!")
     getWrongValues(y_pred,Y_test,channels,shouldReturnMetrics)
-    return svm    
+    return svm
     print(len(X_test))
 
 def predict(x_test,model):
@@ -127,6 +127,7 @@ def getWrongValues(pred_values,y_test,channels,shouldReturnMetrics=True):
         print(channels)
 
 def predictGame(svm,vectorizer):
-    test = ["To date, 10 such #Ebola flare-ups hv been identified in W Africa & are likely due to the virus persisting in survivors even after recovery"]
-    print(vectorizer.transform(test))
-    print(svm.predict(vectorizer.transform(test)))
+    for x in range(0,3):
+        test=[raw_input("Type a message: ")]
+        print(vectorizer.transform(test).toarray())
+        print(svm.predict(vectorizer.transform(test).toarray()))

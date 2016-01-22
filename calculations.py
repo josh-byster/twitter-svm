@@ -7,6 +7,7 @@ Created on Mon Nov 16 15:01:36 2015
 import re
 import time
 import pprint
+import random
 from scipy import stats
 import math
 from credentials import keys
@@ -17,10 +18,13 @@ from sklearn.externals import joblib
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.svm import LinearSVC,SVC
 from sklearn.svm import SVC
+from sklearn.metrics import confusion_matrix
 from sklearn import cross_validation,metrics,grid_search
 from TweetObj import Tweet
-
-
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import plotcm
 def readFromMemory(location):
     return joblib.load(location +'.pkl')
 def store(tweets,location):
@@ -38,6 +42,7 @@ def getY(tweets):
     a=[]
     for obj in tweets:
         a.append(obj.author)
+    #numpy.random.shuffle(a)
     return numpy.asarray(a)
 
 
@@ -82,13 +87,17 @@ def getWrongValues(pred_values,y_test,channels,shouldReturnMetrics=True):
     count_wrong=0
     if(shouldReturnMetrics):
         print("Accuracy percentage: " + str(metrics.accuracy_score(y_test, pred_values, normalize=True, sample_weight=None)))
-        print(metrics.confusion_matrix(y_test, pred_values, labels=channels))
-        print(channels)
-
+        # Compute confusion matrix
+        cm = confusion_matrix(pred_values, y_test)
+        numpy.set_printoptions(precision=2)
+        print('Confusion matrix, without normalization')
+        print(cm)
+        #plt.figure()
+        plotcm.plot_confusion_matrix(cm,channels)
 
 def predictGame(svm,vectorizer):
     for x in range(0,3):
-        test=raw_input("Type a message: ")
+        test=[raw_input("Type a message: ")]
         v=vectorizer.transform(test).toarray()
         print(v)
-        print(svm.predict(vectorizer.transform([test]).toarray()))
+        print(svm.predict(vectorizer.transform(test).toarray()))

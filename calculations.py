@@ -69,7 +69,6 @@ def gs(X,Y,folds,parameters):
     pprint.pprint(clf.grid_scores_)
     pprint.pprint(clf.best_params_)
 
-
 def regularSVM(X,Y,c,pctTest,getFeatureWeights,channels,shouldReturnMetrics):
     svm = LinearSVC(C=c);
     cv=X_train, X_test, Y_train, Y_test = cross_validation.train_test_split(X,Y, test_size=pctTest, random_state=None)

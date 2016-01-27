@@ -28,12 +28,13 @@ api = tweepy.API(auth, parser=tweepy.parsers.JSONParser())
 def parse(channels,n):
     tweets=[getChannelTweets(ch,n) for ch in channels]
     return [item for sublist in tweets for item in sublist]
-def getChannelTweets(channel,n):
+def getChannelTweets(channel,n,showRequestsRemaining=True):
     mx=None
     objList=[]
     while True:
         try:
             statuses = api.user_timeline(id=channel,count=200,max_id=mx)
+            reqsLeft=api.rate_limit_status()['resources']['statuses']['/statuses/user_timeline']['remaining']
         except:
             renew_time = time.strftime("%H:%M:%S", time.gmtime(api.rate_limit_status()['resources']
             ['statuses']['/statuses/user_timeline']['reset']-21600))
@@ -46,6 +47,8 @@ def getChannelTweets(channel,n):
                 objList.append(newTweet)
                 mx=status["id"]-1
                 if(len(objList)==n):
+                    if(showRequestsRemaining):
+                        print(reqsLeft)
                     return objList
         else:
             return objList

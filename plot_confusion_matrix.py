@@ -3,7 +3,6 @@ print(__doc__)
 import numpy as np
 import matplotlib.pyplot as plt
 
-from sklearn.metrics import confusion_matrix
 
 def plot_confusion_matrix(cm,channels, title='Confusion matrix', cmap=plt.cm.Blues):
     plt.imshow(cm, interpolation='nearest', cmap=cmap)

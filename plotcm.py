@@ -6,7 +6,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 
-def plot_confusion_matrix(cm,channels, title='Confusion matrix', cmap=plt.cm.Blues):
+def plot_confusion_matrix(cm,channels, title='Confusion matrix', cmap=plt.cm.Blues,filename="confusion_matrix.png"):
     #plt.figure()
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
@@ -17,5 +17,5 @@ def plot_confusion_matrix(cm,channels, title='Confusion matrix', cmap=plt.cm.Blu
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
-    plt.savefig('confusion_matrix.png')
+    plt.savefig(filename)
     plt.show()

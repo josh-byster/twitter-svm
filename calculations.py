@@ -57,7 +57,8 @@ def vectorize(tweets):
 
 
 def split(tweets):
-   return vectorize(tweets),getY(tweets)
+    x=getY(tweets)
+    return vectorize(tweets),x
 
 
 def gs(X,Y,folds,parameters):
@@ -74,15 +75,20 @@ def regularSVM(X,Y,c,pctTest,getFeatureWeights,channels,shouldReturnMetrics):
     cv=X_train, X_test, Y_train, Y_test = cross_validation.train_test_split(X,Y, test_size=pctTest, random_state=None)
     svm.fit(X_train,Y_train)
     y_pred=svm.predict(X_test)
-    getWrongValues(y_pred,Y_test,channels,shouldReturnMetrics)
+    getWrongValues(y_pred,Y_test,channels,shouldReturnMetrics,num=len(X))
     return svm
 
+def crossValidate(X,Y,folds=10,c=1):
+    svm=LinearSVC(C=c)
+    cv=cross_validation.KFold(len(X), n_folds=folds,shuffle=True,random_state=None)
+    for i in cross_validation.cross_val_score(svm,X,Y,cv=cv):
+        print i
 
 def predict(x_test,model):
     return model.predict(x_test)
 
 
-def getWrongValues(pred_values,y_test,channels,shouldReturnMetrics=True):
+def getWrongValues(pred_values,y_test,channels,shouldReturnMetrics=True,num=0):
     count_wrong=0
     if(shouldReturnMetrics):
         print("Accuracy percentage: " + str(metrics.accuracy_score(y_test, pred_values, normalize=True, sample_weight=None)))
@@ -92,11 +98,13 @@ def getWrongValues(pred_values,y_test,channels,shouldReturnMetrics=True):
         print('Confusion matrix, without normalization')
         print(cm)
         #plt.figure()
-        plotcm.plot_confusion_matrix(cm,channels)
+        plotcm.plot_confusion_matrix(cm,channels,title="Confusion matrix: n=" + str(num/len(channels)),filename="cm"+(str(num/len(channels))))
 
 def predictGame(svm,vectorizer):
-    for x in range(0,3):
-        test=[raw_input("Type a message: ")]
+    while True:
+        test=[re.sub(r"(?:\@|https?\:\/\/)\S+", "URL",raw_input("Type a message: "))]
+        if(test[0]==-1):
+            return
         v=vectorizer.transform(test).toarray()
         print(v)
         print(svm.predict(vectorizer.transform(test).toarray()))

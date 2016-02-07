@@ -78,6 +78,7 @@ def regularSVM(X,Y,c,pctTest,channels,shouldReturnMetrics):
     getWrongValues(y_pred,Y_test,channels,shouldReturnMetrics,num=len(X))
     return svm
 def showCoefficients(svm,vectorizer,channels):
+    channels.sort()
     for i in range(0,len(channels)):
         coef=svm.coef_[i]
         indices=numpy.argsort(coef)
@@ -85,12 +86,10 @@ def showCoefficients(svm,vectorizer,channels):
         sorted_features=numpy.array(vectorizer.get_feature_names())[indices]
         print("Negative 10 FW for " + channels[i])
         for x in range(0,10):
-            print("Coefficient:"+str(sorted_coef[x]))
-            print("Value:"+str(sorted_features[x]))
+            print(sorted_features[x])
         print("Positive 10 FW for " + channels[i])
-        for y in range(len(sorted_coef)-11,len(sorted_coef)-1):
-            print("Coefficient: "+str(round(sorted_coef[y],3)))
-            print("Value: "+str(sorted_features[y]))
+        for y in range(len(sorted_coef)-11,len(sorted_coef)):
+            print(sorted_features[y])
 
 def crossValidate(X,Y,folds=10,c=1):
     svm=LinearSVC(C=c)
@@ -122,3 +121,12 @@ def predictGame(svm,vectorizer):
         v=vectorizer.transform(test).toarray()
         print(v)
         print(svm.predict(vectorizer.transform(test).toarray()))
+
+def testOverN(X,Y,c,pctTest,channels,shouldReturnMetrics=False,increment=100):
+    for i in xrange(100,len(X),50):
+        start = time.time()
+        svm = LinearSVC(C=c);
+        cv=X_train, X_test, Y_train, Y_test = cross_validation.train_test_split(X[:i],Y[:i], test_size=pctTest, random_state=None)
+        svm.fit(X_train,Y_train)
+        y_pred=svm.predict(X_test)
+        print(str(i) + "," + str(metrics.accuracy_score(Y_test, y_pred, normalize=True, sample_weight=None))+","+str(time.time()-start))

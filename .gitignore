@@ -2,3 +2,4 @@
 *.pkl
 credentials.py
 *.png
+*.pyc

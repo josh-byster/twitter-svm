@@ -25,11 +25,12 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import plotcm
+
 def readFromMemory(location):
     return joblib.load(location +'.pkl')
+
 def store(tweets,location):
     joblib.dump(tweets,location+'.pkl')
-
 
 def getX(tweets):
     a=[]
@@ -37,14 +38,11 @@ def getX(tweets):
         a.append(obj.text)
     return a
 
-
 def getY(tweets):
     a=[]
     for obj in tweets:
         a.append(obj.author)
-    #numpy.random.shuffle(a)
     return numpy.asarray(a)
-
 
 def vectorize(tweets):
     vectorizer = CountVectorizer(analyzer='word')
@@ -55,11 +53,9 @@ def vectorize(tweets):
         tweets[i].vector = ft[i]
     return (fit_vectorizer,ft)
 
-
 def split(tweets):
     x=getY(tweets)
     return vectorize(tweets),x
-
 
 def gs(X,Y,folds,parameters):
     cv=cross_validation.KFold(len(X), n_folds=folds,shuffle=True,random_state=None)
@@ -70,14 +66,18 @@ def gs(X,Y,folds,parameters):
     pprint.pprint(clf.grid_scores_)
     pprint.pprint(clf.best_params_)
 
-def regularSVM(X,Y,c,pctTest,channels,shouldReturnMetrics):
+def regularSVM(X,Y,c,pctTest,shouldReturnMetrics):
     svm = LinearSVC(C=c);
     cv=X_train, X_test, Y_train, Y_test = cross_validation.train_test_split(X,Y, test_size=pctTest, random_state=None)
     svm.fit(X_train,Y_train)
     y_pred=svm.predict(X_test)
+    channels=svm.classes_
+    channels.sort()
     getWrongValues(y_pred,Y_test,channels,shouldReturnMetrics,num=len(X))
     return svm
-def showCoefficients(svm,vectorizer,channels):
+
+def showCoefficients(svm,vectorizer):
+    channels=svm.classes_
     channels.sort()
     for i in range(0,len(channels)):
         coef=svm.coef_[i]
@@ -100,19 +100,19 @@ def crossValidate(X,Y,folds=10,c=1):
 def predict(x_test,model):
     return model.predict(x_test)
 
-
 def getWrongValues(pred_values,y_test,channels,shouldReturnMetrics=True,num=0):
     count_wrong=0
     if(shouldReturnMetrics):
         print("Accuracy percentage: " + str(metrics.accuracy_score(y_test, pred_values, normalize=True, sample_weight=None)))
         # Compute confusion matrix
-        cm = confusion_matrix(pred_values, y_test)
+        cm = confusion_matrix(pred_values, y_test,labels=channels)
         numpy.set_printoptions(precision=2)
         print('Confusion matrix, without normalization')
         print(cm)
-        #plt.figure()
-        plotcm.plot_confusion_matrix(cm,channels,title="Confusion matrix: n=" + str(num/len(channels)),filename="cm"+(str(num/len(channels))))
-
+        plt.figure()
+        #plotcm.plot_confusion_matrix(cm,channels,title="Confusion matrix: n=" + str(num/len(channels)),filename="cm"+(str(num/len(channels))))
+        cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, numpy.newaxis]
+        plotcm.plot_confusion_matrix(cm_normalized, channels, title='Normalized confusion matrix, n='+str(num/len(channels)),filename="cm"+(str(num/len(channels)))+"norm")
 def predictGame(svm,vectorizer):
     while True:
         test=[re.sub(r"(?:\@|https?\:\/\/)\S+", "URL",raw_input("Type a message: "))]

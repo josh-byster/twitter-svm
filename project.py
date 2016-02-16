@@ -5,20 +5,20 @@ import random
 retrieveType="load" #should be load or save in quotes - should test set be loaded from memory or fetched new?
 n_folds=10
 parameters = {'kernel':['linear'],'C': [0.01,0.1,1,10,100]}
-loadName='tweets1400' #only matters if type is "load"
+loadName='tweets1200' #only matters if type is "load"
 saveName='newscomp' #only matters if type is "save"
-channels=["nbcnews","bbcnews","foxnews","abcnews"]
+channels=[]
 n=600
 pctTest=0.2
 C=1
 getFeatureWeights=True
 shouldReturnMetrics=True
 gridSearch=False
-SVM=False
+SVM=True
 showCoef=False
 xValidate=False
 shouldPredict=False
-shouldTestOverN=True
+shouldTestOverN=False
 
 if(retrieveType=="load"):
     tweets=readFromMemory(loadName)
@@ -31,17 +31,12 @@ random.shuffle(tweets)
 vect_return,Y = split(tweets)
 X=vect_return[1]
 vectorizer=vect_return[0]
-'''print(tweets[0].text + tweets[0].author)
-for val in range(0,len(X[0])):
-    if(X[0][val]==1):
-        print vectorizer.get_feature_names()[val]
-'''
 if(gridSearch):
     gs(X,Y,folds,parameters)
 if(SVM):
-    svm=regularSVM(X,Y,C,pctTest,channels,shouldReturnMetrics)
+    svm=regularSVM(X,Y,C,pctTest,shouldReturnMetrics)
     if(showCoef):
-        showCoefficients(svm,vectorizer,channels)
+        showCoefficients(svm,vectorizer)
 if(xValidate):
     crossValidate(X,Y,folds=n_folds,c=C)
 if(shouldPredict):

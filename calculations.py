@@ -42,6 +42,7 @@ def getY(tweets):
     a=[]
     for obj in tweets:
         a.append(obj.author)
+
     return numpy.asarray(a)
 
 def vectorize(tweets):
@@ -113,7 +114,9 @@ def getWrongValues(pred_values,y_test,channels,shouldReturnMetrics=True,num=0):
         #plotcm.plot_confusion_matrix(cm,channels,title="Confusion matrix: n=" + str(num/len(channels)),filename="cm"+(str(num/len(channels))))
         cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, numpy.newaxis]
         plotcm.plot_confusion_matrix(cm_normalized, channels, title='Normalized confusion matrix, n='+str(num/len(channels)),filename="cm"+(str(num/len(channels)))+"norm")
-def predictGame(svm,vectorizer):
+def platt_func(x):
+    return float(1.0/(1.0+math.exp(-x)))
+def predictTweet(svm,vectorizer):
     while True:
         test=[re.sub(r"(?:\@|https?\:\/\/)\S+", "URL",raw_input("Type a message: "))]
         if(test[0]==-1):
@@ -121,6 +124,10 @@ def predictGame(svm,vectorizer):
         v=vectorizer.transform(test).toarray()
         print(v)
         print(svm.predict(vectorizer.transform(test).toarray()))
+        z=zip(svm.classes_,svm.decision_function(vectorizer.transform(test).toarray())[0])
+        z.sort(key=lambda tup: tup[1])
+        for i in reversed(range(len(z))):
+            print(z[i][0] + ":" + str(platt_func(z[i][1])))
 
 def testOverN(X,Y,c,pctTest,channels,shouldReturnMetrics=False,increment=100):
     for i in xrange(100,len(X),50):

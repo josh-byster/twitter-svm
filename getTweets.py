@@ -43,12 +43,13 @@ def getChannelTweets(channel,n,showRequestsRemaining=True):
         if statuses:
             for status in statuses:
                 content = re.sub(r"(?:\@|https?\:\/\/)\S+", "URL", status["text"])
-                newTweet = Tweet(content,channel)
-                objList.append(newTweet)
-                mx=status["id"]-1
-                if(len(objList)==n):
-                    if(showRequestsRemaining):
-                        print(reqsLeft)
-                    return objList
+                if(content[0:2]!="RT"):
+                    newTweet = Tweet(content,channel)
+                    objList.append(newTweet)
+                    mx=status["id"]-1
+                    if(len(objList)==n):
+                        if(showRequestsRemaining):
+                            print(reqsLeft)
+                        return objList
         else:
             return objList

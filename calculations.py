@@ -19,7 +19,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.svm import LinearSVC,SVC
 from sklearn.svm import SVC
 from sklearn.metrics import confusion_matrix
-from sklearn import cross_validation,metrics,grid_search
+from sklearn import cross_validation,metrics,grid_search,linear_model
 from TweetObj import Tweet
 import matplotlib
 matplotlib.use('Agg')
@@ -68,7 +68,8 @@ def gs(X,Y,folds,parameters):
     pprint.pprint(clf.best_params_)
 
 def regularSVM(X,Y,c,pctTest,shouldReturnMetrics):
-    svm = LinearSVC(C=c);
+    #svm = LinearSVC(C=c);
+    svm=linear_model.LogisticRegression(C=c);
     cv=X_train, X_test, Y_train, Y_test = cross_validation.train_test_split(X,Y, test_size=pctTest, random_state=None)
     svm.fit(X_train,Y_train)
     y_pred=svm.predict(X_test)
@@ -114,8 +115,6 @@ def getWrongValues(pred_values,y_test,channels,shouldReturnMetrics=True,num=0):
         #plotcm.plot_confusion_matrix(cm,channels,title="Confusion matrix: n=" + str(num/len(channels)),filename="cm"+(str(num/len(channels))))
         cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, numpy.newaxis]
         plotcm.plot_confusion_matrix(cm_normalized, channels, title='Normalized confusion matrix, n='+str(num/len(channels)),filename="cm"+(str(num/len(channels)))+"norm")
-def platt_func(x):
-    return float(1.0/(1.0+math.exp(-x)))
 def predictTweet(svm,vectorizer):
     while True:
         test=[re.sub(r"(?:\@|https?\:\/\/)\S+", "URL",raw_input("Type a message: "))]
@@ -124,10 +123,10 @@ def predictTweet(svm,vectorizer):
         v=vectorizer.transform(test).toarray()
         print(v)
         print(svm.predict(vectorizer.transform(test).toarray()))
-        z=zip(svm.classes_,svm.decision_function(vectorizer.transform(test).toarray())[0])
+        z=zip(svm.classes_,svm.predict_proba(vectorizer.transform(test).toarray())[0])
         z.sort(key=lambda tup: tup[1])
-        for i in reversed(range(len(z))):
-            print(z[i][0] + ":" + str(platt_func(z[i][1])))
+        for i in reversed(range(len(z)-4,len(z))):
+            print(z[i][0] + ": {0:.0f}%".format(z[i][1]*100))
 
 def testOverN(X,Y,c,pctTest,channels,shouldReturnMetrics=False,increment=100):
     for i in xrange(100,len(X),50):

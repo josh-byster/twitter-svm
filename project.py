@@ -7,9 +7,9 @@ import datetime
 retrieveType="load" #should be load or save in quotes - should test set be loaded from memory or fetched new?
 n_folds=10
 parameters = {'kernel':['linear'],'C': [0.01,0.1,1,10,100]}
-loadName='tweets1000' #only matters if type is "load"
-saveName='newscomp' #only matters if type is "save"
-channels=["jimmykimmel","cbsnews","nbcnews","shakira"]
+loadName='16class600' #only matters if type is "load"
+saveName='16class600' #only matters if type is "save"
+channels=["katyperry","BarackObama","YouTube","TheEllenShow","twitter","instagram","cnnbrk","oprah","espn","sportscenter","pitbull","nba","kanyewest","nfl","chrisbrown"]
 n=600
 pctTest=0.2
 C=1

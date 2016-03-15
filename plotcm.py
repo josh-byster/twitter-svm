@@ -12,7 +12,7 @@ def plot_confusion_matrix(cm,channels, title='Confusion matrix', cmap=plt.cm.Blu
     plt.title(title)
     plt.colorbar()
     tick_marks = np.arange(len(channels))
-    plt.xticks(tick_marks, channels, rotation=45)
+    plt.xticks(tick_marks, channels, rotation=45,ha='right')
     plt.yticks(tick_marks, channels)
     plt.tight_layout()
     plt.ylabel('True label')

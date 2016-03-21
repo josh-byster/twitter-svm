@@ -79,6 +79,7 @@ def regularSVM(X,Y,c,pctTest,shouldReturnMetrics):
     return svm
 
 def showCoefficients(svm,vectorizer):
+    #Deal with binary class coefficients
     channels=svm.classes_
     channels.sort()
     for i in range(0,len(channels)):
@@ -92,6 +93,21 @@ def showCoefficients(svm,vectorizer):
         print("Positive 10 FW for " + channels[i])
         for y in range(len(sorted_coef)-11,len(sorted_coef)):
             print(sorted_features[y])
+
+def showBinaryCoefs(svm,vectorizer):
+    channels=svm.classes_
+    channels.sort()
+    coef=svm.coef_[0]
+    indices=numpy.argsort(coef)
+    sorted_coef=coef[indices]
+    sorted_features=numpy.array(vectorizer.get_feature_names())[indices]
+    print("Positive 10 feature weights for " + channels[0])
+    for x in range(0,10):
+        print(sorted_features[x])
+    print("Negative 10 feature weights for " + channels[0])
+    for y in range(len(sorted_coef)-11,len(sorted_coef)):
+        print(sorted_features[y])
+
 
 def crossValidate(X,Y,folds=10,c=1):
     svm=LinearSVC(C=c)

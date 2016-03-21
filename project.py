@@ -4,12 +4,13 @@ import random
 import time
 import datetime
 #MODIFY VARIABLES HERE
-retrieveType="load" #should be load or save in quotes - should test set be loaded from memory or fetched new?
+retrieveType="none" #should be load or save in quotes - should test set be loaded from memory or fetched new?
 n_folds=10
 parameters = {'kernel':['linear'],'C': [0.01,0.1,1,10,100]}
-loadName='16class600' #only matters if type is "load"
+loadName='trump' #only matters if type is "load"
 saveName='16class600' #only matters if type is "save"
-channels=["katyperry","BarackObama","YouTube","TheEllenShow","twitter","instagram","cnnbrk","oprah","espn","sportscenter","pitbull","nba","kanyewest","nfl","chrisbrown"]
+#channels=["katyperry","BarackObama","YouTube","TheEllenShow","twitter","instagram","cnnbrk","oprah","espn","sportscenter","pitbull","nba","kanyewest","nfl","chrisbrown"]
+channels=["rihanna","nba"]
 n=600
 pctTest=0.2
 C=1
@@ -40,7 +41,11 @@ if(gridSearch):
 if(SVM):
     svm=regularSVM(X,Y,C,pctTest,shouldReturnMetrics)
     if(showCoef):
-        showCoefficients(svm,vectorizer)
+        if(len(channels)!=2):
+            showCoefficients(svm,vectorizer)
+        else:
+            print("Note that this is a binary classification")
+            showBinaryCoefs(svm,vectorizer)
 if(xValidate):
     crossValidate(X,Y,folds=n_folds,c=C)
 if(shouldPredict):

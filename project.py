@@ -3,34 +3,24 @@ from getTweets import parse
 import random
 import time
 import datetime
-#MODIFY VARIABLES HERE
-retrieveType="none" #should be load or save in quotes - should test set be loaded from memory or fetched new?
-n_folds=10
-parameters = {'kernel':['linear'],'C': [0.01,0.1,1,10,100]}
-loadName='trump' #only matters if type is "load"
-saveName='16class600' #only matters if type is "save"
-#channels=["katyperry","BarackObama","YouTube","TheEllenShow","twitter","instagram","cnnbrk","oprah","espn","sportscenter","pitbull","nba","kanyewest","nfl","chrisbrown"]
-channels=["rihanna","nba"]
-n=600
-pctTest=0.2
-C=1
-getFeatureWeights=True
-shouldReturnMetrics=True
-gridSearch=False
-SVM=True
-showCoef=True
-xValidate=False
-shouldPredict=True
-shouldTestOverN=False
+from settings import *
 
-start=time.time()
-if(retrieveType=="load"):
+shouldLoad=raw_input("Would you like to load an existing dataset? ")
+if(shouldLoad=="yes"):
+    loadName=raw_input("What's the name of the file you would like to load? ")
     tweets=readFromMemory(loadName)
-else:
+elif(shouldLoad=="no"):
+    print("OK, now parsing channels in the settings file...")
     tweets=parse(channels,n)
-    if(retrieveType=="save"):
+    shouldSave=raw_input("Would you like to save this dataset?")
+    if(shouldSave=="yes"):
+        saveName=raw_input("Please name the dataset file: ")
         store(tweets,saveName)
-print("Loaded " + str(len(tweets)) + " tweets.")
+try:
+    print("Loaded " + str(len(tweets)) + " tweets.")
+except NameError:
+    print("You did not enter a valid input.")
+start=time.time()
 random.shuffle(tweets)
 vect_return,Y = split(tweets)
 #numpy.random.shuffle(Y)
@@ -41,8 +31,9 @@ if(gridSearch):
 if(SVM):
     svm=regularSVM(X,Y,C,pctTest,shouldReturnMetrics)
     if(showCoef):
-        if(len(channels)!=2):
+        if(len(svm.classes_)!=2):
             showCoefficients(svm,vectorizer)
+            print(len(svm.classes_))
         else:
             print("Note that this is a binary classification")
             showBinaryCoefs(svm,vectorizer)

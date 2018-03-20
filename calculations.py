@@ -22,12 +22,11 @@ from sklearn.metrics import confusion_matrix
 from sklearn import cross_validation,metrics,grid_search,linear_model
 from TweetObj import Tweet
 import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import plotcm
 
 def readFromMemory(location):
-    return joblib.load(location +'.pkl')
+    return joblib.load("data/"+location +'.pkl')
 
 def store(tweets,location):
     joblib.dump(tweets,location+'.pkl')
@@ -87,13 +86,17 @@ def showCoefficients(svm,vectorizer):
         indices=numpy.argsort(coef)
         sorted_coef=coef[indices]
         sorted_features=numpy.array(vectorizer.get_feature_names())[indices]
-        print("Negative 10 FW for " + channels[i])
-        for x in range(0,10):
-            print(sorted_features[x])
-        print("Positive 10 FW for " + channels[i])
-        for y in range(len(sorted_coef)-11,len(sorted_coef)):
+        
+        print("Positive 5 FW for " + channels[i])
+        for y in range(len(sorted_coef)-6,len(sorted_coef)):
             print(sorted_features[y])
-
+        print("\n")
+        
+        print("Negative 5 FW for " + channels[i])
+        for x in range(0,5):
+            print(sorted_features[x])
+        print("\n")
+        
 def showBinaryCoefs(svm,vectorizer):
     channels=svm.classes_
     channels.sort()
@@ -113,7 +116,7 @@ def crossValidate(X,Y,folds=10,c=1):
     svm=LinearSVC(C=c)
     cv=cross_validation.KFold(len(X), n_folds=folds,shuffle=True,random_state=None)
     for i in cross_validation.cross_val_score(svm,X,Y,cv=cv):
-        print i
+        print(i)
 
 def predict(x_test,model):
     return model.predict(x_test)
@@ -130,17 +133,16 @@ def getWrongValues(pred_values,y_test,channels,shouldReturnMetrics=True,num=0):
         plt.figure()
         #plotcm.plot_confusion_matrix(cm,channels,title="Confusion matrix: n=" + str(num/len(channels)),filename="cm"+(str(num/len(channels))))
         cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, numpy.newaxis]
-        plotcm.plot_confusion_matrix(cm_normalized, channels, title='Normalized confusion matrix, n='+str(num/len(channels)),filename="cm"+(str(num/len(channels)))+"norm")
+        plotcm.plot_confusion_matrix(cm_normalized, channels, title='Normalized confusion matrix, n='+str(num/len(channels)),filename="cm"+(str(num/len(channels)))+"norm.png")
 def predictTweet(svm,vectorizer):
     while True:
-        test=[re.sub(r"(?:\@|https?\:\/\/)\S+", "URL",raw_input("Type a message: "))]
+        test=[re.sub(r"(?:\@|https?\:\/\/)\S+", "URL",input("Type a message: "))]
         if(test[0]==-1):
             return
         v=vectorizer.transform(test).toarray()
         print(v)
         print(svm.predict(vectorizer.transform(test).toarray()))
-        z=zip(svm.classes_,svm.predict_proba(vectorizer.transform(test).toarray())[0])
-        z.sort(key=lambda tup: tup[1])
+        z=sorted(zip(svm.classes_,svm.predict_proba(vectorizer.transform(test).toarray())[0]), key=lambda tup: tup[1])
         for i in reversed(range(len(z)-4,len(z))):
             print(z[i][0] + ": {0:.0f}%".format(z[i][1]*100))
 

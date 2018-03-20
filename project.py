@@ -5,17 +5,17 @@ import time
 import datetime
 from settings import *
 
-shouldLoad=raw_input("Would you like to load an existing dataset? ")
+shouldLoad=input("Would you like to load an existing dataset? ")
 if(shouldLoad=="yes"):
-    loadName=raw_input("What's the name of the file you would like to load? ")
+    loadName=input("What's the name of the file you would like to load? ")
     tweets=readFromMemory(loadName)
 elif(shouldLoad=="no"):
     print("OK, now parsing channels in the settings file...")
     tweets=parse(channels,n)
-    shouldSave=raw_input("Would you like to save this dataset?")
+    shouldSave=input("Would you like to save this dataset?")
     if(shouldSave=="yes"):
-        saveName=raw_input("Please name the dataset file: ")
-        store(tweets,saveName)
+        saveName=input("Please name the dataset file: ")
+        store(tweets,"data/"+saveName)
 try:
     print("Loaded " + str(len(tweets)) + " tweets.")
 except NameError:

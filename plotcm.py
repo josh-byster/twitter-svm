@@ -2,7 +2,6 @@
 
 import numpy as np
 import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 
@@ -17,5 +16,5 @@ def plot_confusion_matrix(cm,channels, title='Confusion matrix', cmap=plt.cm.Blu
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
-    plt.savefig(filename)
+    plt.savefig("data/"+filename)
     plt.show()
